@@ -59,8 +59,11 @@ router.get('/outh/alipay/gettoken', async (ctx, next)=>{
         o = new LibOuth();
         let ret = JSON.parse(await o.getAuthtoken(auth_code));
         ret.code = 200;
+        if(ret.error_response){
+            ctx.body = JSON.stringify({'code':400,'msg':'非法参数'})
+        }
         ctx.type = 'application/json';
-        ret = JSON.stringify(ret)     
+        ret = JSON.stringify(ret);     
         ctx.body = ret;
     }else{
         ctx.body = JSON.stringify({'code':400,'msg':'非法参数'})
@@ -74,7 +77,10 @@ router.get('/outh/alipay/userinfo', async (ctx, next)=>{
         let ret = JSON.parse(await o.getUserInfo(app_auth_token));
         ret.code = 200;
         ctx.type = 'application/json';
-        ret = JSON.stringify(ret)      
+        ret = JSON.stringify(ret);
+        if(ret.error_response){
+            ctx.body = JSON.stringify({'code':400,'msg':'非法参数'})
+        }      
         ctx.body = ret;
     }else{
         ctx.body = JSON.stringify({'code':400,'msg':'非法参数'});
