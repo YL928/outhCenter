@@ -57,16 +57,22 @@ router.get('/outh/alipay/gettoken', async (ctx, next)=>{
     let auth_code = ctx.query.app_auth_code
     if(auth_code){
         o = new LibOuth();
-        let ret = JSON.parse(await o.getAuthtoken(auth_code));
-        ret.code = 200;
-        if(ret.error_response){
-            ctx.body = JSON.stringify({'code':400,'msg':'非法参数'})
+        try {
+            let ret = JSON.parse(await o.getAuthtoken(auth_code));
+            if(ret.error_response){
+                ctx.body = JSON.stringify({'code':400,'msg':'非法参数'})
+            }else{
+                ret.code = 200;
+                ctx.type = 'application/json';
+                ret = JSON.stringify(ret)     
+                ctx.body = ret;
+            }
+        } catch (error) {
+            ctx.body = JSON.stringify({'code':400,'msg':'内部服务器错误'});
         }
-        ctx.type = 'application/json';
-        ret = JSON.stringify(ret);     
-        ctx.body = ret;
+        
     }else{
-        ctx.body = JSON.stringify({'code':400,'msg':'非法参数'})
+        ctx.body = JSON.stringify({'code':400,'msg':'非法参数'});
     }
 });
 
@@ -74,14 +80,19 @@ router.get('/outh/alipay/userinfo', async (ctx, next)=>{
     let app_auth_token = ctx.query.app_auth_token
     if(app_auth_token!=null && app_auth_token!=undefined){
         o = new LibOuth();
-        let ret = JSON.parse(await o.getUserInfo(app_auth_token));
-        ret.code = 200;
-        ctx.type = 'application/json';
-        ret = JSON.stringify(ret);
-        if(ret.error_response){
-            ctx.body = JSON.stringify({'code':400,'msg':'非法参数'})
-        }      
-        ctx.body = ret;
+        try {
+            let ret = JSON.parse(await o.getAuthtoken(auth_code));
+            if(ret.error_response){
+                ctx.body = JSON.stringify({'code':400,'msg':'非法参数'})
+            }else{
+                ret.code = 200;
+                ctx.type = 'application/json';
+                ret = JSON.stringify(ret)     
+                ctx.body = ret;
+            }
+        } catch (error) {
+            ctx.body = JSON.stringify({'code':400,'msg':'内部服务器错误'});
+        }
     }else{
         ctx.body = JSON.stringify({'code':400,'msg':'非法参数'});
     }
