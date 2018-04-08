@@ -1,7 +1,7 @@
 const router = require('koa-router')();
 const LibOuth = require('../lib/alipayOuth');
 const Utils = require('../lib/utils');
-
+const Log = require('../lib/log_util')
 
 router.get('/outh/callback', async (ctx, next)=>{
     let retObj = ctx.query
@@ -68,6 +68,7 @@ router.get('/outh/alipay/gettoken', async (ctx, next)=>{
                 ctx.body = ret;
             }
         } catch (error) {
+            Log.logError(ctx, error, new Date())
             ctx.body = JSON.stringify({'code':400,'msg':'内部服务器错误'});
         }
         
@@ -81,7 +82,7 @@ router.get('/outh/alipay/userinfo', async (ctx, next)=>{
     if(app_auth_token!=null && app_auth_token!=undefined){
         o = new LibOuth();
         try {
-            let ret = JSON.parse(await o.getAuthtoken(auth_code));
+            let ret = JSON.parse(await o.getUserInfo(app_auth_token));
             if(ret.error_response){
                 ctx.body = JSON.stringify({'code':400,'msg':'非法参数'})
             }else{
@@ -91,6 +92,7 @@ router.get('/outh/alipay/userinfo', async (ctx, next)=>{
                 ctx.body = ret;
             }
         } catch (error) {
+            Log.logError(ctx, error, new Date())
             ctx.body = JSON.stringify({'code':400,'msg':'内部服务器错误'});
         }
     }else{
